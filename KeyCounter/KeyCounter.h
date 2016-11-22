@@ -1,19 +1,32 @@
-#ifndef KEYCOUNTER_H
-#define KEYCOUNTER_H
 
-#include <QtWidgets/QMainWindow>
-#include "ui_KeyCounter.h"
+// KeyCounter.h : PROJECT_NAME 应用程序的主头文件
+//
 
-class KeyCounter : public QMainWindow
+#pragma once
+
+#ifndef __AFXWIN_H__
+	#error "在包含此文件之前包含“stdafx.h”以生成 PCH 文件"
+#endif
+
+#include "resource.h"		// 主符号
+
+
+// CKeyCounterApp:
+// 有关此类的实现，请参阅 KeyCounter.cpp
+//
+
+class CKeyCounterApp : public CWinApp
 {
-	Q_OBJECT
-
 public:
-	KeyCounter(QWidget *parent = 0);
-	~KeyCounter();
+	CKeyCounterApp();
 
-private:
-	Ui::KeyCounterClass ui;
+// 重写
+public:
+	virtual BOOL InitInstance();
+
+// 实现
+
+	DECLARE_MESSAGE_MAP()
 };
 
-#endif // KEYCOUNTER_H
+extern CKeyCounterApp theApp;
