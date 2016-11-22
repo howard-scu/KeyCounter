@@ -1,11 +1,12 @@
-// KeyCounter.cpp : 定义控制台应用程序的入口点。
-//
+#include "KeyCounter.h"
 
-#include "stdafx.h"
-
-
-int main()
+KeyCounter::KeyCounter(QWidget *parent)
+	: QMainWindow(parent)
 {
-    return 0;
+	ui.setupUi(this);
 }
 
+KeyCounter::~KeyCounter()
+{
+
+}
