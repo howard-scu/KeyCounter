@@ -6,7 +6,7 @@
 #include "KeyCounter.h"
 #include "KeyCounterDlg.h"
 #include "afxdialogex.h"
-
+#include "../KeyboardHook/keyboard.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -63,6 +63,9 @@ BEGIN_MESSAGE_MAP(CKeyCounterDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_ADD_HOOK, &CKeyCounterDlg::OnBnClickedAddHook)
+	ON_BN_CLICKED(IDC_REMOVE_HOOK, &CKeyCounterDlg::OnBnClickedRemoveHook)
+	ON_BN_CLICKED(IDC_BTN, &CKeyCounterDlg::OnBnClickedBtn)
 END_MESSAGE_MAP()
 
 
@@ -151,3 +154,27 @@ HCURSOR CKeyCounterDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CKeyCounterDlg::OnBnClickedAddHook()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if ( !SetHook ( TRUE ) )
+		this->MessageBox ( L"安装键盘钩子失败！" ) ;
+
+}
+
+
+void CKeyCounterDlg::OnBnClickedRemoveHook()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if ( !SetHook ( FALSE ) )
+		this->MessageBox ( L"卸载键盘钩子失败！" ) ;
+}
+
+
+void CKeyCounterDlg::OnBnClickedBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString str;
+	str.Format(L"%d", keyCount);
+	::MessageBox ( NULL, str,L"" ,MB_OK ) ;
+}
