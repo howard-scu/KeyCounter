@@ -1,3 +1,0 @@
-LIBRARY	"KeyboardHook"
-	EXPORTS
-	SetHook		@1

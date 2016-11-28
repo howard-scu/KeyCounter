@@ -1,8 +1,10 @@
 #include <windows.h>
 #include "keyboard.h"
 #include "stdio.h"
+#include <iostream>
 
 HINSTANCE	hDllInst	= NULL ;	// DLL模块实例句柄
+UINT		keyCount	= 0 ;
 
 int WINAPI DllMain ( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 { 
@@ -31,7 +33,7 @@ LRESULT CALLBACK KeyboardProc ( int nCode, WPARAM wParam, LPARAM lParam )
 }
 
 // 钩子控制函数，能够启动/卸载钩子
-BOOL WINAPI SetHook ( BOOL isInstall ) 
+BOOL _declspec(dllexport) SetHook ( BOOL isInstall ) 
 {
 	// 需要安装，且键盘钩子不存在
 	if ( isInstall && !hKeyboard )
@@ -55,4 +57,10 @@ BOOL WINAPI SetHook ( BOOL isInstall )
 	}
 
 	return TRUE ;
+}
+
+
+UINT _declspec(dllexport) GetKeyCount ()
+{
+	return keyCount;
 }
