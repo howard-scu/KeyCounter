@@ -108,19 +108,30 @@ BOOL CKeyCounterDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	if ( !SetHook ( TRUE ) )
+	{
+		szTooltip.Format( L"Key Counter初始化失败！" ) ;
+		OnDestroy();
+	}
+	else
+		szTooltip.Format(L"Key Counter初始化成功！");
 
 	m_notify.cbSize=sizeof NOTIFYICONDATA;  
 	m_notify.hWnd=this->m_hWnd;    
 	m_notify.uID=IDI_ICON2;  
 	m_notify.hIcon=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON2));  
-	//strcpy(m_notify.szTip,L"Michael_Chen is a good man");  
 	m_notify.uCallbackMessage=WM_SHOWTASK;  
-	m_notify.uFlags=NIF_ICON|NIF_MESSAGE|NIF_TIP; //OK,下面就是托盘产生了.   
+	m_notify.uFlags=NIF_ICON|NIF_MESSAGE|NIF_TIP; //OK,下面就是托盘产生了.
+	//szTooltip.Format(L"Key Counter\n");
+	wcscpy(m_notify.szTip,szTooltip);
 	Shell_NotifyIcon(NIM_ADD,&m_notify);
+
 
 	// 启动时采用SW_HIDE无效
 	// ShowWindow(SW_HIDE);
-	// SetTimer(1 , 1 , NULL);
+
+	SetTimer(1 , 1000/*ms*/ , NULL);
+	count = 0;
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -200,7 +211,7 @@ LRESULT CKeyCounterDlg::OnShowTask(WPARAM wParam, LPARAM lParam)
 		return 1;
 	switch(lParam)
 	{
-	case WM_RBUTTONUP:                                        // 右键起来时弹出菜单
+	case WM_RBUTTONUP:                                 // 右键起来时弹出菜单
 		{
 			LPPOINT lpoint = new tagPOINT;
 			::GetCursorPos(lpoint);                    // 得到鼠标位置
@@ -241,11 +252,19 @@ void CKeyCounterDlg::OnDestroy()
 
 void CKeyCounterDlg::OnTimer(UINT nIDEvent)  
 {
-   if (nIDEvent == 1)
-   {
-       KillTimer(1);		// 这个貌似应该有DeleteTimer之类的。。不过我没找到。。
-       ShowWindow(SW_HIDE);  // 隐掉它。。
-   }
+	szTooltip.Format(L"Key Press Counts: %d\n",GetKeyCount());
+	wcscpy(m_notify.szTip,szTooltip);
+	Shell_NotifyIcon(NIM_MODIFY,&m_notify);
+
+	//count++;
+	//CString  str;
+	//str.Format(L"%d",count);
+	//TRACE(str);
+   //if (nIDEvent == 1)
+   //{
+   //    KillTimer(1);		// 这个貌似应该有DeleteTimer之类的。。不过我没找到。。
+   //    ShowWindow(SW_HIDE);  // 隐掉它。。
+   //}
 }
 
 void CKeyCounterDlg::OnWindowPosChanging(WINDOWPOS* lpwndpos)

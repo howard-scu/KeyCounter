@@ -40,4 +40,8 @@ public:
 	afx_msg void OnDestroy();
 	afx_msg void OnTimer(UINT nIDEvent); 
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
+
+private:
+	CString szTooltip;
+	int     count;
 };
