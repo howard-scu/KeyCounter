@@ -34,4 +34,10 @@ public:
 	afx_msg void OnBnClickedRemoveHook();
 	afx_msg void OnBnClickedRemoveHook2();
 	afx_msg void OnBnClickedBtn();
+	LRESULT OnShowTask(WPARAM wParam, LPARAM lParam);
+	NOTIFYICONDATA m_notify;  
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnDestroy();
+	afx_msg void OnTimer(UINT nIDEvent); 
+	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 };

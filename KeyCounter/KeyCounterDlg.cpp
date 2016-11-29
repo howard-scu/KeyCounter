@@ -10,7 +10,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+#define WM_SHOWTASK (WM_USER+100)
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -40,6 +40,8 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_WM_SIZE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -51,7 +53,7 @@ END_MESSAGE_MAP()
 CKeyCounterDlg::CKeyCounterDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CKeyCounterDlg::IDD, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON2);
 }
 
 void CKeyCounterDlg::DoDataExchange(CDataExchange* pDX)
@@ -66,8 +68,14 @@ BEGIN_MESSAGE_MAP(CKeyCounterDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_ADD_HOOK, &CKeyCounterDlg::OnBnClickedAddHook)
 	ON_BN_CLICKED(IDC_REMOVE_HOOK, &CKeyCounterDlg::OnBnClickedRemoveHook)
 	ON_BN_CLICKED(IDC_BTN, &CKeyCounterDlg::OnBnClickedBtn)
+	ON_MESSAGE(WM_SHOWTASK,OnShowTask)
+	ON_WM_SIZE()
+	ON_WM_DESTROY()
+	ON_WM_TIMER()
+	ON_WM_WINDOWPOSCHANGING()
 END_MESSAGE_MAP()
 
+#include <Strsafe.h>
 
 // CKeyCounterDlg 消息处理程序
 
@@ -100,8 +108,19 @@ BOOL CKeyCounterDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 在此添加额外的初始化代码
 
+	m_notify.cbSize=sizeof NOTIFYICONDATA;  
+	m_notify.hWnd=this->m_hWnd;    
+	m_notify.uID=IDI_ICON2;  
+	m_notify.hIcon=LoadIcon(AfxGetInstanceHandle(),MAKEINTRESOURCE(IDI_ICON2));  
+	//strcpy(m_notify.szTip,L"Michael_Chen is a good man");  
+	m_notify.uCallbackMessage=WM_SHOWTASK;  
+	m_notify.uFlags=NIF_ICON|NIF_MESSAGE|NIF_TIP; //OK,下面就是托盘产生了.   
+	Shell_NotifyIcon(NIM_ADD,&m_notify);
+
+	// 启动时采用SW_HIDE无效
+	// ShowWindow(SW_HIDE);
+	// SetTimer(1 , 1 , NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -156,25 +175,82 @@ HCURSOR CKeyCounterDlg::OnQueryDragIcon()
 
 void CKeyCounterDlg::OnBnClickedAddHook()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	if ( !SetHook ( TRUE ) )
 		this->MessageBox ( L"安装键盘钩子失败！" ) ;
 
 }
 
-
 void CKeyCounterDlg::OnBnClickedRemoveHook()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	if ( !SetHook ( FALSE ) )
 		this->MessageBox ( L"卸载键盘钩子失败！" ) ;
 }
 
-
 void CKeyCounterDlg::OnBnClickedBtn()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	CString str;
-	str.Format(L"%d", keyCount);
-	::MessageBox ( NULL, str,L"" ,MB_OK ) ;
+	str.Format(L"%d", GetKeyCount());
+	::MessageBox ( NULL, str,L"" ,MB_OK );
+}
+
+
+LRESULT CKeyCounterDlg::OnShowTask(WPARAM wParam, LPARAM lParam)
+{
+	if(wParam != IDI_ICON2)
+		return 1;
+	switch(lParam)
+	{
+	case WM_RBUTTONUP:                                        // 右键起来时弹出菜单
+		{
+			LPPOINT lpoint = new tagPOINT;
+			::GetCursorPos(lpoint);                    // 得到鼠标位置
+			CMenu menu;
+			menu.CreatePopupMenu();                    // 声明一个弹出式菜单
+			menu.AppendMenu(MF_STRING, WM_DESTROY, L"关闭");
+			menu.TrackPopupMenu(TPM_LEFTALIGN, lpoint->x ,lpoint->y, this);
+			HMENU hmenu = menu.Detach();
+			menu.DestroyMenu();
+			delete lpoint;
+		}
+		break;
+	case WM_LBUTTONDBLCLK:                           // 双击左键的处理
+		{
+			this->ShowWindow(SW_SHOWNORMAL);         // 显示主窗口
+			// TODO: 创建对话框
+		}
+		break;
+	}
+	return 0;
+}
+
+void CKeyCounterDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+	if(nType == SIZE_MINIMIZED)  
+	{  
+		ShowWindow(SW_HIDE); // 当最小化市，隐藏主窗口              
+	}  
+}
+
+
+void CKeyCounterDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+	Shell_NotifyIcon(NIM_DELETE,&m_notify);
+}
+
+void CKeyCounterDlg::OnTimer(UINT nIDEvent)  
+{
+   if (nIDEvent == 1)
+   {
+       KillTimer(1);		// 这个貌似应该有DeleteTimer之类的。。不过我没找到。。
+       ShowWindow(SW_HIDE);  // 隐掉它。。
+   }
+}
+
+void CKeyCounterDlg::OnWindowPosChanging(WINDOWPOS* lpwndpos)
+{
+	CDialogEx::OnWindowPosChanging(lpwndpos);
+	lpwndpos->flags &=~SWP_SHOWWINDOW;
+	CDialog::OnWindowPosChanging(lpwndpos);
 }

@@ -19,7 +19,10 @@
     <None Include="res\KeyCounter.rc2">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="res\KeyCounter.ico">
+    <None Include="res\bitbug_favicon.ico">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="res\Black_Keyboard_64px_584778_easyicon.net.ico">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>
